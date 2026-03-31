@@ -1,0 +1,18 @@
+FROM apache/spark-py:latest
+
+RUN apt update && \
+    apt install -y --no-install-recommends \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+RUN uv python install 3.12
+
+COPY . /app
+WORKDIR /app
+RUN uv sync --locked
+
+CMD ["uv", "run", "app.analytics.spark_analytics"]
+
+
